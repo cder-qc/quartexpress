@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabaseBrowser";
 import { Card, Button, Input, Label, Muted } from "@/components/ui";
 
@@ -9,15 +8,20 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const search = useSearchParams();
-  const role = search.get("role");
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setRole(params.get("role"));
+  }, []);
 
   async function sendLink() {
     if (!email.trim()) return alert("Ajoute ton email.");
     setLoading(true);
 
     const base = process.env.NEXT_PUBLIC_APP_URL || "";
-    const redirectTo = role === "employer" ? `${base}/app/set-role/employer` : `${base}/auth/callback`;
+    const redirectTo =
+      role === "employer" ? `${base}/app/set-role/employer` : `${base}/auth/callback`;
 
     const supabase = supabaseBrowser();
     const { error } = await supabase.auth.signInWithOtp({
@@ -39,7 +43,9 @@ export default function AuthPage() {
         <Label>Email</Label>
         <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemple.com" />
         <div style={{ height: 12 }} />
-        <Button onClick={sendLink} disabled={loading}>{loading ? "Envoi..." : "Envoyer le lien magique"}</Button>
+        <Button onClick={sendLink} disabled={loading}>
+          {loading ? "Envoi..." : "Envoyer le lien magique"}
+        </Button>
         <div style={{ height: 10 }} />
         {sent ? <Muted>✅ Lien envoyé. Vérifie ta boîte mail (et tes spams).</Muted> : <Muted>Tu seras redirigé automatiquement après clic.</Muted>}
       </Card>
