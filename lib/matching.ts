@@ -9,7 +9,7 @@ function makeCode(len = 6) {
 }
 
 export async function triggerMatching(shiftId: string) {
-  const { data: shift, error: shiftErr } = await supabaseAdmin.from("shifts").select("*").eq("id", shiftId).single();
+  const { data: shift, error: shiftErr } = await supabaseAdmin().from("shifts").select("*").eq("id", shiftId).single();
   if (shiftErr || !shift) throw new Error(shiftErr?.message ?? "Shift introuvable");
 
   const { data: candidates, error: candErr } = await supabaseAdmin

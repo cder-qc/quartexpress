@@ -5,6 +5,7 @@ import { z } from "zod";
 const Body = z.object({ employer_user_id: z.string() });
 
 export async function POST(req: Request) {
+  try {
   const body = Body.parse(await req.json());
 
   const { data: shifts, error } = await supabaseAdmin
@@ -16,4 +17,7 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true, shifts });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500 });
+  }
 }

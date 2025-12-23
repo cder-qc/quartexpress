@@ -14,6 +14,7 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
+  try {
   const body = Body.parse(await req.json());
 
   const { data: shift, error } = await supabaseAdmin
@@ -38,5 +39,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, shift_id: shift.id, dispatch: result });
   } catch (e: any) {
     return NextResponse.json({ ok: true, shift_id: shift.id, dispatch_error: e?.message ?? "dispatch error" });
+  }
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500 });
   }
 }

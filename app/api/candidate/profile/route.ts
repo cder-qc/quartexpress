@@ -12,11 +12,12 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
+  try {
   const body = Body.parse(await req.json());
 
-  await supabaseAdmin.from("profiles").upsert({ user_id: body.user_id, role: "candidate", phone: body.phone });
+  await supabaseAdmin().from("profiles").upsert({ user_id: body.user_id, role: "candidate", phone: body.phone });
 
-  const { error } = await supabaseAdmin.from("candidate_profiles").upsert({
+  const { error } = await supabaseAdmin().from("candidate_profiles").upsert({
     user_id: body.user_id,
     services: body.services,
     min_rate: body.min_rate ?? null,
@@ -26,4 +27,7 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500 });
+  }
 }

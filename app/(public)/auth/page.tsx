@@ -8,9 +8,10 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null); // "employer" | null
 
   useEffect(() => {
+    // Évite useSearchParams (peut causer un build error sur Vercel si pas de Suspense)
     const params = new URLSearchParams(window.location.search);
     setRole(params.get("role"));
   }, []);
@@ -21,7 +22,9 @@ export default function AuthPage() {
 
     const base = process.env.NEXT_PUBLIC_APP_URL || "";
     const redirectTo =
-      role === "employer" ? `${base}/app/set-role/employer` : `${base}/auth/callback`;
+      role === "employer"
+        ? `${base}/app/set-role/employer`
+        : `${base}/auth/callback`;
 
     const supabase = supabaseBrowser();
     const { error } = await supabase.auth.signInWithOtp({
@@ -47,7 +50,11 @@ export default function AuthPage() {
           {loading ? "Envoi..." : "Envoyer le lien magique"}
         </Button>
         <div style={{ height: 10 }} />
-        {sent ? <Muted>✅ Lien envoyé. Vérifie ta boîte mail (et tes spams).</Muted> : <Muted>Tu seras redirigé automatiquement après clic.</Muted>}
+        {sent ? (
+          <Muted>✅ Lien envoyé. Vérifie ta boîte mail (et tes spams).</Muted>
+        ) : (
+          <Muted>Tu seras redirigé automatiquement après clic.</Muted>
+        )}
       </Card>
     </main>
   );
