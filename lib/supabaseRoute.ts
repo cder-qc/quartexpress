@@ -13,7 +13,6 @@ export function supabaseRoute() {
       cookies: {
         getAll() { return cookieStore.getAll(); },
         setAll(cookiesToSet: any[]) { cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); },
-
         },
       },
     }
